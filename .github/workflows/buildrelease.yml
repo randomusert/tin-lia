@@ -66,7 +66,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DEPLOY }}
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
@@ -75,4 +75,4 @@ jobs:
             artifacts/linux/tin-lia-linux.zip
             artifacts/win/tin-lia-win.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DEPLOY }}
