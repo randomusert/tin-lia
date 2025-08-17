@@ -5,7 +5,7 @@ OBJS = $(patsubst %.c,%.o,$(wildcard *.c))
 all: libwin.dll libwin.dll.a
 
 libwin.dll libwin.dll.a: $(OBJS) ../liblia/liblia.dll.a
-	$(CC) -shared -o libwin.dll $(OBJS) -L../liblia -llia -lws2_32 -Wl,--out-implib,libwin.dll.a -Wl,--enable-auto-import
+	$(CC) -shared -o libwin.dll $(OBJS) -L../liblia -llia -lws2_32 -Wl,--out-implib,libwin.dll.a -Wl,--enable-auto-import -DWIN32 -lws2_32
 
 clean:
 	rm -f *.o libwin.dll libwin.dll.a

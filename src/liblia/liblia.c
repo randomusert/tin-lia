@@ -58,10 +58,12 @@ void loop(void) {
             }
             else if (strcmp(cmd, "server") == 0)
             {
-                
+                servercmd();
             }
-            
-             else {
+            else if (strcmp(cmd, "client") == 0)
+            {
+                clientcmd();
+            } else {
                 printf("Unknown command: %s\n", cmd);
             }
             

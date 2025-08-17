@@ -1,12 +1,8 @@
 #include "libwin.h"
 #include <stdio.h>
-void libwin_init(void) {
-    // Initialization code for the Windows platform can be added here.
-    // For now, we just print a message to indicate that the library has been initialized.
-    printf("libwin initialized.\n");
-}
 
-void network_server_win() {
+
+void network_server_win(void) {
     #define WIN32_LEAN_AND_MEAN
 
     // Link with Ws2_32.lib
@@ -98,7 +94,7 @@ void network_server_win() {
     return 0;
 }
 
-void network_client_win() {
+void network_client_win(void) {
     WSADATA wsaData;
     SOCKET ConnectSocket = INVALID_SOCKET;
     struct sockaddr_in serverAddr;
@@ -124,7 +120,7 @@ void network_client_win() {
 
     // Setup server address
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(27015); // same port as server
+    serverAddr.sin_port = htons(8080); // same port as server
     inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 
     // Connect to server

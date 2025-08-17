@@ -9,7 +9,7 @@
 int main(void) {
     // Platform-specific initialization
 #ifdef WIN32
-    libwin_init();
+    printf("Initializing Windows library...\n");
 #elif defined(__linux__)
     liblinux_init();
 #endif

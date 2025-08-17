@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-void libwin_init(void);
+
 
 // use winsocks for networking
 void network_client_win(void);
