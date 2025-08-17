@@ -11,7 +11,10 @@ else
   TARGETS = liblia.a liblia.so
 endif
 
-SRCS    = $(wildcard *.c)
+SRCS    = $(wildcard *.c) \
+		   $(wildcard commands/*.c)
+
+
 OBJS    = $(patsubst %.c,$(OBJDIR)/%.o,$(SRCS))
 
 .PHONY: all clean
@@ -20,6 +23,7 @@ all: $(TARGETS)
 # make sure obj dir exists
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
+	mkdir -p $(OBJDIR)/commands
 
 # per-file compile into platform-specific objdir
 $(OBJDIR)/%.o: %.c | $(OBJDIR)

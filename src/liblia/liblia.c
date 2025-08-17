@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "commands/testcmd.h"
+#include "commands/server.h"
+#include "commands/client.h"
 
 #define CMD_MAX 256
 
@@ -37,6 +39,8 @@ void loop(void) {
                 printf("q - quit\n");
                 printf("shutdown - shutdown the system\n");
                 printf("test - test command\n");
+                printf("server - start a basic web server\n");
+                printf("client - start a basic client\n");
                 // Add more commands as needed
             // show help; do NOT recurse into the loop
             }
@@ -52,6 +56,11 @@ void loop(void) {
             else if (strcmp(cmd, "test") == 0) {
                 testcmd();
             }
+            else if (strcmp(cmd, "server") == 0)
+            {
+                
+            }
+            
              else {
                 printf("Unknown command: %s\n", cmd);
             }
