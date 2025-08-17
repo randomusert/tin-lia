@@ -1,0 +1,78 @@
+name: Build and Release Cross-Platform Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'          # run on version tags
+  workflow_dispatch:   # allows manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [linux, win]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up build environment
+        if: matrix.platform == 'win'
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64 make zip
+
+      - name: Install build tools (Linux)
+        if: matrix.platform == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y build-essential zip
+
+      - name: Build project
+        run: |
+          make clean
+          make build PLATFORM=${{ matrix.platform }}
+
+      - name: Package binaries
+        run: |
+          if [ "${{ matrix.platform }}" == "linux" ]; then
+            zip -r tin-lia-linux.zip tin-lia src/liblinux/liblinux.so src/liblia/liblia.so
+          else
+            zip -r tin-lia-win.zip tin-lia.exe libwin.dll liblia.dll
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-binaries
+          path: |
+            tin-lia-linux.zip
+            tin-lia-win.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-binaries
+          path: ./artifacts/linux
+      - uses: actions/download-artifact@v3
+        with:
+          name: win-binaries
+          path: ./artifacts/win
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/linux/tin-lia-linux.zip
+            artifacts/win/tin-lia-win.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
