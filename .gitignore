@@ -8,3 +8,5 @@
 *.obj
 *.dll.a
 tin-lia
+obj-win
+obj-linux
