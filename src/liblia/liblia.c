@@ -1,6 +1,6 @@
 #include "liblia.h"
 #include "../liblinux/liblinux.h"
-
+#include "../libwin/libwin.h"
 
 void liblia_init(void) {
     // Initialization code for the library can be added here.
