@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c",
+        "*.cpp": "cpp",
+        "*.hpp": "cpp",
+        "*.sh": "shellscript",
+        "*.txt": "plaintext",
+        "*.md": "markdown",
+        "*.json": "json",
+    }
+}
