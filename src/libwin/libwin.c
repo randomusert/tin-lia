@@ -1,7 +1,7 @@
 #include "libwin.h"
 #include <stdio.h>
 
-
+#warning "building windows pltform specific code"
 void network_server_win(void) {
     #define WIN32_LEAN_AND_MEAN
 

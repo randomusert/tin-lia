@@ -1,6 +1,7 @@
 CC = x86_64-w64-mingw32-gcc
 CFLAGS = -Wall -Wextra -O2
-OBJS = $(patsubst %.c,%.o,$(wildcard *.c))
+OBJS = $(patsubst %.c,%.o,$(wildcard *.c)) \
+	   $(patsubst %.c,%.o,$(wildcard io/*.c))
 
 all: libwin.dll libwin.dll.a
 

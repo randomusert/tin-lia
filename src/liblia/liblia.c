@@ -32,8 +32,9 @@ void loop(void) {
     {
         
         char cmd[CMD_MAX];
+        printf(">");
         while (read_cmd(cmd, sizeof cmd)) {
-            printf(">");
+            
             if (strcmp(cmd, "h") == 0) {
                 printf("Help - show this message\n");
                 printf("q - quit\n");
