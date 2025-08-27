@@ -1,8 +1,9 @@
 AC_INIT([tin-lia], [0.1])
 AM_INIT_AUTOMAKE([foreign subdir-objects dist-zip])
+LT_INIT
 AC_CONFIG_HEADERS([config.h])
 
-
+#prog/libs
 AC_PROG_RANLIB
 
 

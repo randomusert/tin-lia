@@ -1,9 +1,6 @@
 #!/bin/sh
 set -x
 
-# Normal build artifacts
-make distclean || true
-
 # Autotools generated files
 rm -f aclocal.m4 configure config.h.in
 rm -f config.log config.status
@@ -24,5 +21,6 @@ rm -f install-sh
 rm -f missing
 rm -rf build-win
 rm -rf build-linux
-
+rm -f config.*
+rm -f ltmain.sh
 echo "Cleaned autotools and build artifacts."
