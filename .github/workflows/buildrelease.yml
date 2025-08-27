@@ -39,8 +39,9 @@ jobs:
              cd build-win
              ../configure --with-platform=win
           else
+              pwd
               cd build-linux
-            ../configure --with-platform=linux
+              ../configure --with-platform=linux
           fi
 
       - name: Build
