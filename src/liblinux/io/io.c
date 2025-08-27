@@ -1,5 +1,7 @@
 #include "io.h"
+#include <stdio.h>
 
+#warning "file IO operations are not implemented yet"
 void file_win(void) {
     // This function can be used to implement file operations.
     // For now, we just print a message to indicate that the function is called.

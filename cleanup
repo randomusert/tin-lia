@@ -1,0 +1,28 @@
+#!/bin/sh
+set -x
+
+# Normal build artifacts
+make distclean || true
+
+# Autotools generated files
+rm -f aclocal.m4 configure config.h.in
+rm -f config.log config.status
+rm -rf autom4te.cache
+rm -f Makefile.in */Makefile.in */*/Makefile.in
+rm -f libtool
+rm -rf src/.deps src/*/.deps src/*/*/.deps
+rm -f compile config.h.in~ configure~
+rm -f *.o */*.o */*/*.o
+rm -f *.lo */*.lo */*/*.lo
+rm -f *.a */*.a */*/*.a
+rm -f *.so */*.so */*/*.so
+rm -f *.so.* */*.so.* */*/*.so.*
+rm -f tin-lia */tin-lia */*/tin-lia
+rm -f tin_lia */tin_lia
+rm -f depcomp
+rm -f install-sh
+rm -f missing
+rm -rf build-win
+rm -rf build-linux
+
+echo "Cleaned autotools and build artifacts."
