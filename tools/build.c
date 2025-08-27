@@ -92,10 +92,10 @@ int main() {
             clear();
             switch(choice) {
                 case 0: // Linux build
-                    run_command("mkdir -p build-linux && cd build-linux && ../bootstrap && ../configure --with-platform=linux && make -j$(nproc)");
+                    run_command("mkdir -p build-linux && cd build-linuxx && ../configure --with-platform=linux && make -j$(nproc)");
                     break;
                 case 1: // Windows build
-                    run_command("mkdir -p build-win && cd build-win && ../bootstrap && CC=x86_64-w64-mingw32-gcc ../configure --with-platform=win && make -j$(nproc)");
+                    run_command("mkdir -p build-win && cd build-win &&CC=x86_64-w64-mingw32-gcc ../configure --with-platform=win && make -j$(nproc)");
                     break;
                 case 2: // Both
                     run_command("mkdir -p build-linux && cd build-linux && ../bootstrap && ../configure --with-platform=linux && make -j$(nproc)");
