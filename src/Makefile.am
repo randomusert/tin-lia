@@ -18,5 +18,5 @@ tin_lia_LDADD += liblinux/liblinux.a
 endif
 
 if BUILD_WIN
-tin_lia_LDADD += libwin/libwin.a
+tin_lia_LDADD += libwin/libwin.a -lws2_32
 endif

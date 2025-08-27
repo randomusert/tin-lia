@@ -7,6 +7,7 @@ on:
   workflow_dispatch:   # allows manual trigger
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -17,25 +18,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up build environment
-        if: matrix.platform == 'win'
-        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64 make zip
-
-      - name: Install build tools (Linux)
-        if: matrix.platform == 'linux'
-        run: sudo apt-get update && sudo apt-get install -y build-essential zip
-
-      - name: Build project
+      - name: Install build tools
         run: |
-          make clean
-          make build PLATFORM=${{ matrix.platform }}
+          sudo apt-get update
+          sudo apt-get install -y autoconf automake libtool make gawk pkg-config zip
+          if [ "${{ matrix.platform }}" = "win" ]; then
+            sudo apt-get install -y mingw-w64
+          else
+            sudo apt-get install -y build-essential
+          fi
+
+      - name: Bootstrap Autotools
+        run: ./bootstrap
+      - name: Prepare build directories
+        run: ./prepdirs
+
+      - name: Configure
+        run: |
+          if [ "${{ matrix.platform }}" = "win" ]; then
+             cd build-win
+             ../configure --with-platform=win
+          else
+              cd build-linux
+            ../configure --with-platform=linux
+          fi
+
+      - name: Build
+        run: make -j$(nproc)
 
       - name: Package binaries
         run: |
-          if [ "${{ matrix.platform }}" == "linux" ]; then
-            zip -r tin-lia-linux.zip tin-lia src/liblinux/liblinux.so src/liblia/liblia.so
+          if [ "${{ matrix.platform }}" = "win" ]; then
+            zip -r tin-lia-win.zip tin-lia.exe libwin/libwin.a liblia/liblia.a
           else
-            zip -r tin-lia-win.zip tin-lia.exe libwin.dll liblia.dll
+            zip -r tin-lia-linux.zip tin-lia liblinux/liblinux.a liblia/liblia.a
           fi
 
       - name: Upload build artifacts
@@ -50,12 +66,14 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download build artifacts
+      - name: Download Linux artifacts
         uses: actions/download-artifact@v4
         with:
           name: linux-binaries
           path: ./artifacts/linux
-      - uses: actions/download-artifact@v4
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
         with:
           name: win-binaries
           path: ./artifacts/win
