@@ -1,0 +1,33 @@
+name: bug report
+description: report bugs
+title: '[BUG]: '
+labels: "bug"
+projects: "randomusert/5"
+
+body:
+ - type: markdown
+   attributes:
+     value: "please report the bug"
+ - type: textarea
+   id: what_happened
+   attributes:
+     label: what happened?
+     description: what did you expect to see?
+     placeholder: what you see?
+     value: "i see a bug"
+  validitation:
+     required: true
+ - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com). 
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
