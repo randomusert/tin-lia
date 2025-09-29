@@ -1,5 +1,5 @@
-name: bug report
-description: report bugs
+name: "bug report"
+description: "report bugs"
 title: '[BUG]: '
 labels: "bug"
 projects: "randomusert/5"
