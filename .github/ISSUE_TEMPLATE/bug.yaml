@@ -3,7 +3,6 @@ description: "report bugs"
 title: '[BUG]: '
 labels: "bug"
 projects: "randomusert/5"
-
 body:
  - type: markdown
    attributes:
