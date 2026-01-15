@@ -1,0 +1,30 @@
+# -------------------------
+# Project metadata
+# -------------------------
+[project]
+name = "tin-lia"         # your project name
+version = "0.0.5a"        # project version
+
+# -------------------------
+# Build configuration
+# -------------------------
+[build]
+build_dir = "build"       # directory where builds are generated
+jobs = 4                  # number of parallel jobs for make
+
+# -------------------------
+# Platform-specific build options
+# -------------------------
+[platforms.linux]
+configure_flags = ["--enable-optimizations", "--prefix=/usr/local"]
+
+[platforms.windows]
+configure_flags = ["--host=x86_64-w64-mingw32"]
+
+
+# -------------------------
+# Release configuration
+# -------------------------
+[release]
+github_repo = "randomusert/tin-lia"   # e.g., GitHub org/repo
+artifacts = ["build/*"]             # glob of files to upload in release
