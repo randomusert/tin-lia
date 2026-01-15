@@ -13,3 +13,34 @@
 2026-01-15 19:19:03,303 [INFO] forge: Project root found at /mnt/d/tin-lia
 2026-01-15 19:19:03,303 [INFO] forge: Loading config: /mnt/d/tin-lia/forge.toml
 2026-01-15 19:19:03,304 [INFO] forge: Forge starting
+2026-01-15 19:22:24,000 [INFO] forge: Bootstrapping Autoconf…
+2026-01-15 19:22:24,000 [INFO] forge: Bootstrapping Autoconf
+2026-01-15 19:22:34,194 [INFO] forge: Bootstrap done
+2026-01-15 19:22:45,122 [INFO] forge: Building project…
+2026-01-15 19:22:45,122 [INFO] forge: Building for platform: linux
+2026-01-15 19:23:04,196 [INFO] forge: ERROR: Command '['make', '-j4']' returned non-zero exit status 2.
+2026-01-15 19:23:04,197 [ERROR] forge: Operation failed
+Traceback (most recent call last):
+  File "/mnt/d/tin-lia/tools/tin-forge/forge.py", line 184, in on_button_pressed
+    build_project(self.root, self.config)
+  File "/mnt/d/tin-lia/tools/tin-forge/forge.py", line 117, in build_project
+    run(["make", f"-j{jobs}"], cwd=build_dir)
+  File "/mnt/d/tin-lia/tools/tin-forge/forge.py", line 60, in run
+    subprocess.run(cmd, cwd=cwd, check=True)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['make', '-j4']' returned non-zero exit status 2.
+2026-01-15 19:25:20,035 [INFO] forge: Building project…
+2026-01-15 19:25:20,035 [INFO] forge: Building for platform: linux
+2026-01-15 19:25:34,200 [INFO] forge: ERROR: Command '['make', '-j4']' returned non-zero exit status 2.
+2026-01-15 19:25:34,200 [ERROR] forge: Operation failed
+Traceback (most recent call last):
+  File "/mnt/d/tin-lia/tools/tin-forge/forge.py", line 184, in on_button_pressed
+    build_project(self.root, self.config)
+  File "/mnt/d/tin-lia/tools/tin-forge/forge.py", line 117, in build_project
+    run(["make", f"-j{jobs}"], cwd=build_dir)
+  File "/mnt/d/tin-lia/tools/tin-forge/forge.py", line 60, in run
+    subprocess.run(cmd, cwd=cwd, check=True)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['make', '-j4']' returned non-zero exit status 2.

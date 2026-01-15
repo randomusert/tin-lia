@@ -16,9 +16,11 @@ jobs = 4                  # number of parallel jobs for make
 # Platform-specific build options
 # -------------------------
 [platforms.linux]
+build_subdir = "linux"
 configure_flags = ["--enable-optimizations", "--prefix=/usr/local"]
 
 [platforms.windows]
+build_subdir = "win32"
 configure_flags = ["--host=x86_64-w64-mingw32"]
 
 

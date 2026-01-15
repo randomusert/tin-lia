@@ -1,154 +1,145 @@
 #!/usr/bin/env python3
+"""
+Forge - Build & Release Tool for Autoconf Projects
+Single-file Python tool with TUI (Textual)
+"""
 
+import sys
+import os
+import shutil
+import logging
 import subprocess
 import platform
-import logging
-import sys
 from pathlib import Path
+import toml
+
+from textual.app import App, ComposeResult
+from textual.widgets import Button, Header, Footer, Log
+from textual.containers import Vertical
+from textual import events
 
 # -------------------------
 # Logging setup
 # -------------------------
-
-LOG_FILE = "forge.log"
-
+log = logging.getLogger("forge")
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[
-        logging.FileHandler(LOG_FILE, encoding="utf-8"),
-        logging.StreamHandler(sys.stdout),
-    ],
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] forge: %(message)s"
 )
 
-write_log = logging.getLogger("forge")
+# -------------------------
+# Detect platform
+# -------------------------
+PY_PLATFORM = platform.system().lower()
+if PY_PLATFORM.startswith("mingw") or PY_PLATFORM.startswith("windows"):
+    CURRENT_PLATFORM = "windows"
+elif PY_PLATFORM.startswith("linux"):
+    CURRENT_PLATFORM = "linux"
+elif PY_PLATFORM.startswith("darwin"):
+    CURRENT_PLATFORM = "macos"
+else:
+    CURRENT_PLATFORM = "linux"
 
 # -------------------------
-# Imports with dependencies
+# Helper functions
 # -------------------------
-
-try:
-    import tomllib  # py3.11+
-except ImportError:
-    write_log.error("Python 3.11+ required (tomllib missing)")
-    sys.exit(1)
-
-
-
-
-try:
-    from textual.app import App, ComposeResult
-    from textual.widgets import Button, Header, Footer, Log
-    from textual.containers import Vertical
-except ImportError:
-    print(
-        "Your Textual version is too old.\n\n"
-        "Debian ships an outdated Textual package.\n"
-        "Please use a virtual environment:\n\n"
-        "  python3 -m venv .venv\n"
-        "  source .venv/bin/activate\n"
-        "  pip install 'textual>=0.50'\n"
-    )
-    raise
-
-# -------------------------
-# Utilities
-# -------------------------
-
 def run(cmd, cwd=None):
-    write_log.debug("Running command: %s", " ".join(cmd))
-    subprocess.run(cmd, cwd=cwd, check=True)
+    """Run a command and raise if it fails, logging output"""
+    log.debug("Running command: %s", " ".join(cmd))
+    result = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True)
+    log.debug(result.stdout)
+    log.debug(result.stderr)
+    result.check_returncode()
+    return result
 
-def find_project_root() -> Path:
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        if (parent / "forge.toml").exists():
-            write_log.info("Project root found at %s", parent)
-            return parent
-    raise RuntimeError("forge.toml not found (project root unresolved)")
+def write_log(widget: Log, message: str):
+    """Write to TUI log and Python logging"""
+    widget.write(message)
+    log.info(message)
 
-# -------------------------
-# Config
-# -------------------------
+def clean_build(root: Path, build_dir: Path, widget: Log):
+    """Remove platform-specific build folder"""
+    if build_dir.exists():
+        shutil.rmtree(build_dir)
+        write_log(widget, f"Removed build folder: {build_dir}")
 
-def load_config(root: Path) -> dict:
-    cfg = root / "forge.toml"
-    write_log.info("Loading config: %s", cfg)
-    with cfg.open("rb") as f:
-        return tomllib.load(f)
+def clean_autoconf(root: Path, widget: Log):
+    """Remove bootstrap/autoconf files"""
+    files_to_remove = [
+        "configure", "Makefile.in", "aclocal.m4",
+        "autom4te.cache"
+    ]
+    for f in files_to_remove:
+        path = root / f
+        if path.exists():
+            if path.is_dir():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+            write_log(widget, f"Removed {path}")
 
-# -------------------------
-# Autoconf bootstrap
-# -------------------------
+def bootstrap_autoconf(root: Path, widget: Log):
+    """Run autoconf bootstrap if configure missing"""
+    configure_path = root / "configure"
+    if configure_path.exists():
+        write_log(widget, "Configure script exists, skipping bootstrap")
+        return
+    write_log(widget, "Bootstrapping Autoconf project...")
+    try:
+        run(["autoreconf", "-i"], cwd=root)
+        write_log(widget, "Bootstrap complete")
+    except subprocess.CalledProcessError as e:
+        write_log(widget, f"Bootstrap failed: {e}")
+        raise
 
-def bootstrap_autoconf(root: Path):
-    write_log.info("Bootstrapping Autoconf")
-    run(["autoreconf", "-fi"], cwd=root)
+def build_project(root: Path, config: dict, widget: Log, platform_name: str):
+    """Run configure + make in platform-specific folder"""
+    platform_cfg = config["platforms"].get(platform_name, {})
+    build_subdir = platform_cfg.get("build_subdir", platform_name)
+    build_dir = root / config["build"]["build_dir"] / build_subdir
+    build_dir.mkdir(parents=True, exist_ok=True)
 
-# -------------------------
-# Build system
-# -------------------------
+    # Run configure
+    configure_flags = platform_cfg.get("configure_flags", [])
+    configure_script = root / "configure"
+    if not configure_script.exists():
+        bootstrap_autoconf(root, widget)
 
-def detect_platform():
-    sysname = platform.system().lower()
-    if "windows" in sysname:
-        return "windows"
-    if "linux" in sysname:
-        return "linux"
-    if "darwin" in sysname:
-        return "macos"
-    return sysname
+    write_log(widget, f"Running configure in {build_dir}...")
+    run([str(configure_script), *configure_flags], cwd=build_dir)
+    write_log(widget, "Configure complete")
 
-def build_project(root: Path, config: dict):
-    build_cfg = config.get("build", {})
-    build_dir = root / build_cfg.get("build_dir", "build")
-    jobs = build_cfg.get("jobs", 1)
-
-    target = detect_platform()
-    platform_cfg = config.get("platforms", {}).get(target, {})
-    flags = platform_cfg.get("configure_flags", [])
-
-    build_dir.mkdir(exist_ok=True)
-
-    write_log.info("Building for platform: %s", target)
-    write_log.debug("Configure flags: %s", flags)
-
-    run([str(root / "configure"), *flags], cwd=build_dir)
+    # Run make
+    jobs = config["build"].get("jobs", 1)
+    write_log(widget, f"Running make -j{jobs} in {build_dir}...")
     run(["make", f"-j{jobs}"], cwd=build_dir)
+    write_log(widget, "Build complete")
+
+def github_release(root: Path, config: dict, widget: Log):
+    """Create GitHub release (requires gh CLI)"""
+    repo = config["release"]["github_repo"]
+    artifacts_glob = config["release"].get("artifacts", ["build/*"])
+    write_log(widget, f"Creating GitHub release for {repo}...")
+    try:
+        # Example: tag with version from project config
+        version = config["project"]["version"]
+        run(["gh", "release", "create", f"v{version}", *artifacts_glob], cwd=root)
+        write_log(widget, "Release complete")
+    except subprocess.CalledProcessError as e:
+        write_log(widget, f"Release failed: {e}")
+        raise
 
 # -------------------------
-# GitHub Release
+# Forge App TUI
 # -------------------------
-
-def github_release(root: Path, config: dict):
-    project = config["project"]
-    release = config["release"]
-
-    tag = f"v{project['version']}"
-    name = f"{project['name']} {project['version']}"
-
-    write_log.info("Creating GitHub release %s", tag)
-
-    run([
-        "gh", "release", "create", tag,
-        "--repo", release["github_repo"],
-        "--title", name,
-        "--generate-notes"
-    ])
-
-    artifacts = release.get("artifacts", [])
-    if artifacts:
-        run(["gh", "release", "upload", tag, *artifacts])
-
-# -------------------------
-# TUI
-# -------------------------
-
 class ForgeApp(App):
-    CSS = "Vertical { padding: 1; }"
+
+    CSS_PATH = None
+    BINDINGS = [("q", "quit", "Quit")]
 
     def __init__(self, root: Path, config: dict):
         super().__init__()
+        App.title = "Forge - Build & Release Tool"
         self.root = root
         self.config = config
 
@@ -158,50 +149,60 @@ class ForgeApp(App):
             Button("Bootstrap Autoconf", id="bootstrap"),
             Button("Build", id="build"),
             Button("Build + Release", id="release"),
+            Button("Clean Build", id="clean_build"),
+            Button("Clean All", id="clean_all"),
             Button("Exit", id="exit"),
-            Log(id="write_log"),
+            Log(id="log"),
         )
         yield Footer()
 
-    def write_log(self, message: str):
-        self.query_one("#write_log", Log).write(message)
-        write_log.info(message)
-
-    def on_button_pressed(self, event: Button.Pressed):
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        log_widget = self.query_one("#log", Log)
         try:
             if event.button.id == "bootstrap":
-                self.write_log("Bootstrapping Autoconf…")
-                bootstrap_autoconf(self.root)
-                self.write_log("Bootstrap done")
+                bootstrap_autoconf(self.root, log_widget)
 
             elif event.button.id == "build":
-                self.write_log("Building project…")
-                build_project(self.root, self.config)
-                self.write_log("Build done")
+                build_project(self.root, self.config, log_widget, CURRENT_PLATFORM)
 
             elif event.button.id == "release":
-                self.write_log("Building project…")
-                build_project(self.root, self.config)
-                self.write_log("Creating GitHub release…")
-                github_release(self.root, self.config)
-                self.write_log("Release done")
+                build_project(self.root, self.config, log_widget, CURRENT_PLATFORM)
+                github_release(self.root, self.config, log_widget)
+
+            elif event.button.id == "clean_build":
+                platform_cfg = self.config["platforms"].get(CURRENT_PLATFORM, {})
+                build_subdir = platform_cfg.get("build_subdir", CURRENT_PLATFORM)
+                build_dir = self.root / self.config["build"]["build_dir"] / build_subdir
+                clean_build(self.root, build_dir, log_widget)
+
+            elif event.button.id == "clean_all":
+                # clean build and autoconf files
+                platform_cfg = self.config["platforms"].get(CURRENT_PLATFORM, {})
+                build_subdir = platform_cfg.get("build_subdir", CURRENT_PLATFORM)
+                build_dir = self.root / self.config["build"]["build_dir"] / build_subdir
+                clean_build(self.root, build_dir, log_widget)
+                clean_autoconf(self.root, log_widget)
 
             elif event.button.id == "exit":
                 self.exit()
 
-        except Exception as e:
-            self.write_log(f"ERROR: {e}")
-            write_log.exception("Operation failed")
+        except subprocess.CalledProcessError as e:
+            write_log(log_widget, f"ERROR: {e}")
+            log.exception("Operation failed")
 
 # -------------------------
 # Main
 # -------------------------
-
 def main():
-    root = find_project_root()
-    config = load_config(root)
+    root = Path(__file__).parent.parent.parent.resolve()
+    config_path = root / "forge.toml"
 
-    write_log.info("Forge starting")
+    if not config_path.exists():
+        print(f"Missing forge.toml at {config_path}")
+        sys.exit(1)
+
+    config = toml.load(config_path)
+    print(f"Forge starting. Project root: {root}")
     app = ForgeApp(root, config)
     app.run()
 

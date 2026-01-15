@@ -1,7 +1,0 @@
-#!/bin/sh
-set -e
-./cleanup
-
-mkdir -p build-linux
-mkdir -p build-win
-echo "Prepared build directories."

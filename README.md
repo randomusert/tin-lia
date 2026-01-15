@@ -12,13 +12,8 @@ after build infrasturcture change from writing makefiles by hand to gnu autotool
 
 to build, run 
 ```bash
-./prepdirs # prepare build folders
-./bootstrap # create configure script
-cd build-win # for windows build
-cd build-linux # for linux build
-../configure --with-platform=win # for windows build
-../configure ---with-platform=linux # for linux build
-make # for both, linux and windows builds
+# Everything can be now built by a custom tool called tin-forge
+python tools/tin-forge/forge.py
 ```
 ## running
 to run it, just launch the binary
