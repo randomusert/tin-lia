@@ -14,5 +14,5 @@ body:
      description: what did you expect to see?
      placeholder: what you see?
      value: "i see a bug"
-  validitation:
+   validation:
      required: true
