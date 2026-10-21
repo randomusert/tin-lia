@@ -13,7 +13,7 @@ void liblinux_init(void) {
     // For now, we just print a message to indicate that the library has been initialized.
     printf("liblinux initialized.\n");
 }
-void network_client_linux() {
+int network_client_linux(void) {
     int sock = 0;
     struct sockaddr_in serv_addr;
     char buffer[1024] = {0};
@@ -48,7 +48,7 @@ void network_client_linux() {
     return 0;
 }
 
-void network_server_linux() {
+int network_server_linux(void) {
     int server_fd, new_socket;
     struct sockaddr_in address;
     int addrlen = sizeof(address);

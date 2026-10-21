@@ -1,24 +1,24 @@
 AC_INIT([tin-lia], [0.1])
 AM_INIT_AUTOMAKE([foreign subdir-objects dist-zip])
-LT_INIT
 AC_CONFIG_HEADERS([config.h])
 
-#prog/libs
-AC_PROG_RANLIB
-
-
 AC_ARG_WITH([platform],
-  [AS_HELP_STRING([--with-platform],
-                  [choose platform: linux or win])],
-  [with_platform=$withval],
-  [with_platform=linux]) # default
+  [AS_HELP_STRING([--with-platform=PLATFORM],
+                  [choose platform: linux or win (default: linux)])],
+  [
+    if test "$withval" = "yes" || test "$withval" = "no"; then
+      with_platform=linux
+    else
+      with_platform="$withval"
+    fi
+  ],
+  [with_platform=linux])
 
-# Choose compiler before running AC_PROG_CC
 case "$with_platform" in
   linux)
     CC=gcc
-    AM_CONDITIONAL([BUILD_LINUX], [true])
-    AM_CONDITIONAL([BUILD_WIN], [false])
+    platform_linux=yes
+    platform_win=no
     ;;
   win)
     AC_CHECK_PROG([HAVE_MINGW], [x86_64-w64-mingw32-gcc], [yes], [no])
@@ -26,17 +26,22 @@ case "$with_platform" in
       AC_MSG_ERROR([MinGW cross-compiler not found: please install mingw-w64])
     fi
     CC=x86_64-w64-mingw32-gcc
-    AM_CONDITIONAL([BUILD_LINUX], [false])
-    AM_CONDITIONAL([BUILD_WIN], [true])
+    platform_linux=no
+    platform_win=yes
     ;;
   *)
     AC_MSG_ERROR([Invalid platform: $with_platform. Use linux or win.])
     ;;
 esac
 
-# NOW run compiler detection
-AC_PROG_CC
+AC_SUBST([CC])
 
+AC_PROG_CC
+LT_INIT
+AC_PROG_RANLIB
+
+AM_CONDITIONAL([BUILD_LINUX], [test "$platform_linux" = "yes"])
+AM_CONDITIONAL([BUILD_WIN], [test "$platform_win" = "yes"])
 
 
 AC_CONFIG_FILES([

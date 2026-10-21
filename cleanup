@@ -23,6 +23,6 @@ rm -rf build-win
 rm -rf build-linux
 rm -f config.*
 rm -f ltmain.sh
-rm -rf build
+rm -rf build-linux build-win build-windows
 rm -rf dist
 echo "Cleaned autotools and build artifacts."

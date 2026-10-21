@@ -1,5 +1,4 @@
-lib_LTLIBRARIES = libwin.la
-libwin_la_SOURCES = \
+noinst_LIBRARIES = libwin.a
+libwin_a_SOURCES = \
     libwin.c libwin.h \
     io/io.c io/io.h
-libwin_la_LDFLAGS = -version-info 0:0:0 -shared

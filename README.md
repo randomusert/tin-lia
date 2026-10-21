@@ -15,6 +15,14 @@ to build, run
 # Everything can be now built by a custom tool called tin-forge
 python tools/tin-forge/forge.py
 ```
+
+To configure a platform manually, pass the value with `=`:
+```bash
+./configure --with-platform=linux
+```
+
+Autoconf treats a value passed as a separate argument (`--with-platform linux`)
+as a positional configuration name, which causes the `config.sub` error.
 ## running
 to run it, just launch the binary
 
