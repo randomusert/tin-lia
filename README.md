@@ -27,9 +27,25 @@ as a positional configuration name, which causes the `config.sub` error.
 The libraries are managed through libtool. To build without static library
 archives, use:
 ```bash
-./configure --with-platform=linux --disable-static
+./configure --with-platform=win --disable-static --prefix=/tmp/tin-lia-install
 make
 make install
+```
+
+For a Windows shared build, distribute these files from the install `bin`
+directory together:
+```text
+tin-lia.exe
+liblia-0.dll
+libwin-0.dll
+```
+
+The dependency chain is `tin-lia.exe` -> `liblia-0.dll` ->
+`libwin-0.dll`; `libwin` is not embedded in the executable. Inspect the
+installed executable (or `src/.libs/tin-lia.exe`), not an executable left
+over from an earlier static build:
+```text
+dumpbin /dependents tin-lia.exe
 ```
 ## running
 to run it, just launch the binary

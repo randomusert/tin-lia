@@ -1,10 +1,8 @@
 #include "io.h"
 #include <stdio.h>
-#warning "file IO operations are not implemented yet"
+#include <windows.h>
 
-
-void file_win(void) {
-    // This function can be used to implement file operations.
-    // For now, we just print a message to indicate that the function is called.
-    printf("File operations are not implemented yet.\n");
+void fileOpen(char file[], LPOFSTRUCT lpReopenBuff, UINT uStyle) {
+    LPCSTR lpFileName = file; 
+    OpenFile(lpFileName, lpReopenBuff, uStyle); 
 }

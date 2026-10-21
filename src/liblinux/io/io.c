@@ -1,9 +1,9 @@
 #include "io.h"
 #include <stdio.h>
+#include <fcntl.h>
 
-#warning "file IO operations are not implemented yet"
-void file_win(void) {
-    // This function can be used to implement file operations.
-    // For now, we just print a message to indicate that the function is called.
-    printf("File operations are not implemented yet.\n");
+// Map linux file syscalls to this function
+// This is part of the impl for the liblinux.
+void fileOpen(char file[], int flags, mode_t mode) {
+    open(file, flags, mode);
 }
