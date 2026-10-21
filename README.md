@@ -23,6 +23,14 @@ To configure a platform manually, pass the value with `=`:
 
 Autoconf treats a value passed as a separate argument (`--with-platform linux`)
 as a positional configuration name, which causes the `config.sub` error.
+
+The libraries are managed through libtool. To build without static library
+archives, use:
+```bash
+./configure --with-platform=linux --disable-static
+make
+make install
+```
 ## running
 to run it, just launch the binary
 

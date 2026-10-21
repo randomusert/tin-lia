@@ -26,6 +26,7 @@ case "$with_platform" in
       AC_MSG_ERROR([MinGW cross-compiler not found: please install mingw-w64])
     fi
     CC=x86_64-w64-mingw32-gcc
+    host_alias=x86_64-w64-mingw32
     platform_linux=no
     platform_win=yes
     ;;
